@@ -1,4 +1,4 @@
-#include "HelloWorldScene.h"
+ #include "HelloWorldScene.h"
 
 USING_NS_CC;
 
@@ -73,6 +73,25 @@ bool HelloWorld::init()
     this->addChild(sprite, 0);
     
     return true;
+
+	for (int i = 0; i < 5; i++) {
+		static int padding = 100;
+		auto block = Sprite::create("blocks.png");
+		auto blockBody = PhysicsBody::createBox(block->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
+		blockBody->getShape(0)->setDensity(10.0f);
+		blockBody->getShape(0)->setFriction(0.0f);
+		blockBody->getShape(0)->setRestitution(1.f);
+		blockBody->setDynamic(false);
+		// Create the distance even among the bricks
+		int xOffset = padding + block->getContentSize().width / 2 +
+			((block->getContentSize().width + padding)*i);
+		block->setPosition(xOffset, 450);
+		blockBody->setContactTestBitmask(0x000001);
+		block->setPhysicsBody(blockBody);
+		block->setTag(3);
+		this->addChild(block);
+	}
+
 }
 
 
