@@ -92,6 +92,54 @@ bool HelloWorld::init()
 		this->addChild(block);
 	}
 
+	*Add ContactListener
+
+		auto dispatcher = Director::getInstance()->getEventDispatcher();
+	auto contactListener = EventListenerPhysicsContact::create();
+	contactListener->onContactBegin = CC_CALLBACK_1(HelloWorld::onContactBegin, this);
+	dispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
+
+	*Build the function onContactBegin
+
+		bool HelloWorld::onContactBegin(PhysicsContact& contact)
+	{
+		// Get two collided object
+		auto spriteA = (Sprite*)contact.getShapeA()->getBody()->getNode();
+		auto spriteB = (Sprite*)contact.getShapeB()->getBody()->getNode();
+
+		// Check kinds of objects
+		int tagA = spriteA->getTag();
+		int tagB = spriteB->getTag();
+
+		if (tagA == 3) // is brick
+		{
+
+			this->removeChild(spriteA, true); // delete brick
+
+			//spriteA->removeFromParentAndCleanup(true);
+		}
+
+		if (tagB == 3)  // is brick
+		{
+			this->removeChild(spriteB, true); // delete brick
+
+			//spriteB->removeFromParentAndCleanup(true);
+		}
+
+		// If the ball collides with the floor and the coordinate Y of the ball is smaller than the paddle, Game Over happens
+		if ((tagA == 0 || tagB == 0)& (ball->getPositionY() <= paddle->getPositionY()))
+		{
+			auto gameOverScene = GameOverScene::create();
+			gameOverScene->getLayer()->getLabel()->setString("You Lose!");
+			Director::getInstance()->replaceScene(gameOverScene);
+		}
+
+		return true;
+	}
+
+	This class GameOverScene is similar in the first project
+
+
 }
 
 
