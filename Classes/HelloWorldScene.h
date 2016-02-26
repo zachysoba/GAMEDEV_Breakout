@@ -11,7 +11,7 @@ public:
 
 	Sprite* ball;
 	Sprite* paddle;
-	Sprite* edgeSp;
+	Sprite* border;
 
 	PhysicsWorld* m_world;
 	
@@ -31,6 +31,10 @@ public:
     static cocos2d::Scene* createScene();
 
     virtual bool init();  
+
+	int score;
+	int highScore = 0;
+	cocos2d::Label* labelScore;
 	
 	//virtual void onEnter();
     

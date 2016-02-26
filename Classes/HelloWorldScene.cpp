@@ -35,20 +35,24 @@ bool HelloWorld::init()
     }
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
-	auto origin = Director::getInstance()->getVisibleOrigin();
+	auto origin = Director::getInstance()->getVisibleOrigin();	
 
-	
+	this->labelScore = Label::createWithSystemFont("Score: 0", "Arial", 25);
+	this->labelScore->setPosition(Point(visibleSize.width - labelScore->getContentSize().width, visibleSize.height - labelScore->getContentSize().height));
+	this->addChild(labelScore);
+
+	score = 0;
     
-	edgeSp = Sprite::create();
-	auto boundBody = PhysicsBody::createEdgeBox(visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3);
-	boundBody->getShape(0)->setRestitution(1.0f); 
-	boundBody->getShape(0)->setFriction(0.0f);
-	boundBody->getShape(0)->setDensity(10.0f);
-	edgeSp->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2)); 
-	edgeSp->setPhysicsBody(boundBody); 
-	boundBody->setContactTestBitmask(0x000001);
-	this->addChild(edgeSp);
-	edgeSp->setTag(0);
+	border = Sprite::create();
+	auto borderBody = PhysicsBody::createEdgeBox(visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3);
+	borderBody->getShape(0)->setRestitution(1.0f); 
+	borderBody->getShape(0)->setFriction(0.0f);
+	borderBody->getShape(0)->setDensity(10.0f);
+	border->setPosition(Point(visibleSize.width / 2, visibleSize.height / 2)); 
+	border->setPhysicsBody(borderBody); 
+	borderBody->setContactTestBitmask(0x000001);
+	this->addChild(border);
+	border->setTag(0);
 	
 
 	ball = Sprite::create("ball.png", Rect(0, 0, 18, 18));
@@ -97,7 +101,7 @@ bool HelloWorld::init()
 		brick->setTag(3);
 		this->addChild(brick);
 	}
-
+	
 	for (int i = 0; i < 7; i++) {
 
 		static int padding = 52;
@@ -135,7 +139,7 @@ bool HelloWorld::init()
 		brick->setTag(3);
 		this->addChild(brick);
 	}
-	
+		
 	
 	auto touchListener = EventListenerTouchOneByOne::create();
 	touchListener->setSwallowTouches(true);
@@ -149,12 +153,9 @@ bool HelloWorld::init()
 	auto contactListener = EventListenerPhysicsContact::create();
 	contactListener->onContactBegin = CC_CALLBACK_1(HelloWorld::onContactBegin, this);    
     dispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
-	
-	
-	
+
 	
 	this->schedule(schedule_selector(HelloWorld::tick),0);
-	
 	
     return true;
 }
@@ -172,6 +173,7 @@ void HelloWorld::onTouchEnded(Touch* touch, Event* event)
 
 void HelloWorld::tick(float dt)
 {	
+	auto visibleSize = Director::getInstance()->getVisibleSize();
 
 	bool isWin = true;
 	Vector<PhysicsBody*> bodies = m_world->getAllBodies();
@@ -186,6 +188,7 @@ void HelloWorld::tick(float dt)
 	{
 		auto gameOverScene = GameOverScene::create();
 		gameOverScene->getLayer()->getLabel()->setString("You Won!");
+
 		Director::getInstance()->replaceScene(gameOverScene);
 	}
 	
@@ -199,6 +202,7 @@ void HelloWorld::onTouchMoved(Touch* touch, Event* event){
 
 bool HelloWorld::onContactBegin(PhysicsContact& contact)
 {
+	auto visibleSize = Director::getInstance()->getVisibleSize();
 
 	auto spriteA = (Sprite*)contact.getShapeA()->getBody()->getNode();
 	auto spriteB = (Sprite*)contact.getShapeB()->getBody()->getNode();
@@ -208,11 +212,29 @@ bool HelloWorld::onContactBegin(PhysicsContact& contact)
 	if (tagA == 3)
 	{
 		this->removeChild(spriteA,true);
+
+		score += 10;
+		//if (score>highScore) highScore = score;
+		this->removeChild(labelScore);
+		char scoreCount[20] = { 0 };
+		sprintf(scoreCount, "Score: %d", score);
+		labelScore = Label::createWithSystemFont(scoreCount, "Arial", 25);
+		labelScore->setPosition(Point(visibleSize.width - labelScore->getContentSize().width, visibleSize.height - labelScore->getContentSize().height));
+		this->addChild(labelScore);
 	}
 
 	if (tagB == 3)
 	{
 		this->removeChild(spriteB,true); 
+
+		score += 10;
+		//if (score>highScore) highScore = score;
+		this->removeChild(labelScore);
+		char scoreCount[20] = { 0 };
+		sprintf(scoreCount, "Score: %d", score);
+		labelScore = Label::createWithSystemFont(scoreCount, "Arial", 25);
+		labelScore->setPosition(Point(visibleSize.width - labelScore->getContentSize().width, visibleSize.height - labelScore->getContentSize().height));
+		this->addChild(labelScore);
 	}
 
 	auto origin = Director::getInstance()->getVisibleOrigin();
@@ -223,6 +245,7 @@ bool HelloWorld::onContactBegin(PhysicsContact& contact)
 	{
 		auto gameOverScene = GameOverScene::create();
 		gameOverScene->getLayer()->getLabel()->setString("You Lost!");
+
 		Director::getInstance()->replaceScene(gameOverScene);
 	}
 	
